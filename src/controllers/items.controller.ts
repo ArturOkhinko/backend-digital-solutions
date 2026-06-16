@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateItemInput, GetItemsQuery } from '../schemas/items.schema';
+import { CreateItemInput, CreateItemsInput, GetItemsQuery } from '../schemas/items.schema';
 import * as itemsService from '../services/items.service';
 
 export const getItems = (req: Request, res: Response): void => {
@@ -16,4 +16,9 @@ export const createItem = (req: Request, res: Response, next: NextFunction): voi
   } catch (error) {
     next(error);
   }
+};
+
+export const createItems = (req: Request, res: Response): void => {
+  const created = itemsService.createItems(req.body as CreateItemsInput);
+  res.status(200).json({ created });
 };
