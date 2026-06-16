@@ -8,6 +8,7 @@ export const getItemsQuerySchema = z
   .object({
     lastId: idSchema.optional(),
     limit: z.coerce.number().int().positive().max(100).default(20),
+    search: z.string().min(1).optional(),
   })
   .strict();
 

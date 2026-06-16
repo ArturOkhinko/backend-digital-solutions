@@ -82,6 +82,17 @@ export class InMemoryDatabase<T extends Identifiable> {
     return this.records.slice(startIndex, startIndex + limit);
   }
 
+  search(afterId: Id | undefined, limit: number, query: string): T[] {
+    const startIndex = afterId === undefined ? 0 : this.findFirstIndexAfter(afterId);
+    const matches: T[] = [];
+    for (let i = startIndex; i < this.records.length && matches.length < limit; i += 1) {
+      if (String(this.records[i].id).includes(query)) {
+        matches.push(this.records[i]);
+      }
+    }
+    return matches;
+  }
+
   private findFirstIndexAfter(id: Id): number {
     let low = 0;
     let high = this.records.length;

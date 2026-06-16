@@ -68,6 +68,19 @@ describe('getItems service', () => {
     expect(result.items[19]).toEqual({ id: 40 });
     expect(result.lastId).toBe(40);
   });
+
+  it('searches across the whole database by id substring', () => {
+    const result = getItems({ limit: 5, search: '123' });
+    expect(result.items[0]).toEqual({ id: 123 });
+    expect(result.items.every((item) => String(item.id).includes('123'))).toBe(true);
+  });
+
+  it('paginates search results with the cursor', () => {
+    const first = getItems({ limit: 3, search: '99' });
+    const second = getItems({ lastId: first.lastId as number, limit: 3, search: '99' });
+    expect(second.items.every((item) => String(item.id).includes('99'))).toBe(true);
+    expect(second.items[0].id).not.toBe(first.items[0].id);
+  });
 });
 
 describe('createItem service', () => {
