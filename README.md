@@ -1,37 +1,71 @@
 # Backend
 
-Node.js + Express + TypeScript + Zod, layered architecture, no database.
+Сервер на Express и TypeScript. Хранит данные в памяти. При старте создаёт 1 000 000 элементов с id от 1 до 1 000 000.
 
-## Layers
+## Запуск локально
 
-```
-src/
-  index.ts                 # entry point, starts the server
-  app.ts                   # express app, middleware, mounts /api router
-  routes/                  # HTTP routing layer
-    index.ts
-    getUsers.route.ts
-  controllers/             # request/response + Zod validation
-    getUsers.controller.ts
-  services/                # business logic (not implemented yet)
-    getUsers.service.ts
-  schemas/                 # Zod schemas + inferred types
-    getUsers.schema.ts
-tests/
-  getUsers.test.ts
-```
-
-## Endpoint
-
-`GET /api/users?lastUserId=<id>&limit=20` — accepts the id of the last user and
-returns the next 20 users. Business logic is a TODO in the service layer.
-
-## Scripts
+Установи зависимости.
 
 ```
 npm install
-npm run dev        # start with ts-node-dev
-npm run typecheck  # tsc --noEmit
-npm run lint       # eslint (airbnb)
-npm test           # jest
 ```
+
+Создай файл .env. Можно скопировать готовый пример.
+
+```
+cp .env.example .env
+```
+
+В файле .env есть две настройки. PORT это порт сервера. CORS_ORIGIN это адрес фронтенда, которому разрешены запросы.
+
+```
+PORT=5003
+CORS_ORIGIN=http://localhost:5005
+```
+
+Запусти сервер в режиме разработки. Он сам перезапускается при изменениях.
+
+```
+npm run start
+```
+
+Сервер поднимется на http://localhost:5003
+
+Проверить что сервер отвечает можно так.
+
+```
+curl http://localhost:5003/api/items
+```
+
+## Запуск для продакшена
+
+Сначала собери проект. Потом запусти собранный код.
+
+```
+npm run build
+npm run start:prod
+```
+
+## Тесты и проверки
+
+```
+npm test
+npm run lint
+npm run typecheck
+```
+
+## Эндпоинты
+
+GET /api/items отдаёт доступные элементы по 20 штук. Принимает lastId для следующей страницы, search для поиска по id, limit для размера страницы.
+
+POST /api/items создаёт один элемент. Тело { "id": число или строка }.
+
+POST /api/items/batch создаёт сразу несколько элементов. Тело { "ids": [ ... ] }.
+
+GET /api/selected отдаёт выбранные элементы по 20 штук. Параметры такие же как у items.
+
+POST /api/selected добавляет элементы в выбранные. Тело { "ids": [ ... ] }.
+
+DELETE /api/selected убирает элементы из выбранных. Тело { "ids": [ ... ] }.
+
+PATCH /api/selected/reorder меняет порядок выбранного элемента. Тело { "id": ..., "afterId": ... или null }.
