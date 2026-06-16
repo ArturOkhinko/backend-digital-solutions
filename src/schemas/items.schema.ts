@@ -1,26 +1,35 @@
 import { z } from 'zod';
 
-/**
- * Query schema for the getItems route.
- * `lastId` is the cursor (id of the last received item); optional.
- * `limit` defaults to 20.
- */
-export const getItemsQuerySchema = z.object({
-  lastId: z.coerce.number().int().positive().optional(),
-  limit: z.coerce.number().int().positive().max(100).default(20),
-});
+export const idSchema = z.union([z.coerce.number().int().positive(), z.string().min(1)]);
+
+export type Id = z.infer<typeof idSchema>;
+
+export const getItemsQuerySchema = z
+  .object({
+    lastId: idSchema.optional(),
+    limit: z.coerce.number().int().positive().max(100).default(20),
+  })
+  .strict();
 
 export type GetItemsQuery = z.infer<typeof getItemsQuerySchema>;
 
+export const createItemSchema = z
+  .object({
+    id: idSchema,
+  })
+  .strict();
+
+export type CreateItemInput = z.infer<typeof createItemSchema>;
+
 export const itemSchema = z.object({
-  id: z.number().int().positive(),
+  id: idSchema,
 });
 
 export type Item = z.infer<typeof itemSchema>;
 
 export const getItemsResponseSchema = z.object({
   items: z.array(itemSchema),
-  lastId: z.number().int().positive().nullable(),
+  lastId: idSchema.nullable(),
 });
 
 export type GetItemsResponse = z.infer<typeof getItemsResponseSchema>;
