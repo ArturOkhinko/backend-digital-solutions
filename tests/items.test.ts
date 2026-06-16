@@ -1,6 +1,6 @@
 import { InMemoryDatabase } from '../src/database/InMemoryDatabase';
 import { itemsDatabase, seedItems, TOTAL_ITEMS, Item } from '../src/database/itemsDatabase';
-import { createItem, getItems } from '../src/services/items.service';
+import { createItem, createItems, getItems } from '../src/services/items.service';
 import { ConflictError } from '../src/errors';
 
 describe('InMemoryDatabase', () => {
@@ -98,5 +98,12 @@ describe('createItem service', () => {
 
   it('throws ConflictError for a duplicate id', () => {
     expect(() => createItem({ id: 1 })).toThrow(ConflictError);
+  });
+
+  it('creates many items in a batch and skips existing ones', () => {
+    const created = createItems({ ids: [1, 'batch-a', 'batch-b'] });
+    expect(created).toBe(2);
+    expect(itemsDatabase.has('batch-a')).toBe(true);
+    expect(itemsDatabase.has('batch-b')).toBe(true);
   });
 });

@@ -7,7 +7,7 @@ export type Id = z.infer<typeof idSchema>;
 export const getItemsQuerySchema = z
   .object({
     lastId: idSchema.optional(),
-    limit: z.coerce.number().int().positive().max(100).default(20),
+    limit: z.coerce.number().int().positive().max(1000).default(20),
     search: z.string().min(1).optional(),
   })
   .strict();
@@ -21,6 +21,14 @@ export const createItemSchema = z
   .strict();
 
 export type CreateItemInput = z.infer<typeof createItemSchema>;
+
+export const createItemsSchema = z
+  .object({
+    ids: z.array(idSchema).min(1),
+  })
+  .strict();
+
+export type CreateItemsInput = z.infer<typeof createItemsSchema>;
 
 export const itemSchema = z.object({
   id: idSchema,
